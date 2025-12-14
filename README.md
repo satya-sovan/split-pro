@@ -5,152 +5,267 @@
 
   <h1 align="center">SplitPro</h1>
   <h2 align="center">An open source alternative to Splitwise</h2>
+  <p align="center">
+    <strong>🎉 Now with Unified Deployment - Single Container, Single URL!</strong>
+  </p>
 
-## About
-
-SplitPro aims to provide an open-source way to share expenses with your friends.
-
-It's meant to be a complete replacement for Splitwise.
-
-It currently has most of the important features.
-
-- Add expenses with an individual or groups
-- Overall balances across the groups
-- Multiple currency support
-- Upload expense bills
-- PWA support
-- Split expense unequally (share, percentage, exact amounts, adjustments)
-- Push notification
-- Download your data
-- Import from splitwise
-- simplify group debts
-- community translations, feel free to add your language!
-- **UPCOMING** currency conversion, quickly convert expenses and group balances
-- **UPCOMING** recurrent transactions
-- **UPCOMING** bank account transaction integration
-
-**More features coming every day**
-
-## Versions
-
-Split Pro is for self hosting. To get the most recent features you can build an image from source. Stabilized changes which you can see in GitHub releases are available as Docker images on DockerHub and ghcr. In the past we used to have a community hosted instance at https://splitpro.app, but it is no longer maintained and stuck at version `1.3.4`
 
 ---
 
-## Why
+## 🎉 New Architecture: Python FastAPI + Vue.js
 
-Splitwise is one of the best apps to add expenses and bills.
+**This repository has been migrated to a modern Python + Vue.js stack!**
 
-I understand that every app needs to make money, After all, lots of effort has been put into Splitwise. My main problem is how they implemented this.
+> **📦 Legacy Code:** The original Next.js/React implementation is preserved in the `.bak-project/` folder.
 
-Monetising on pro features or ads is fine, but asking money for adding expenses (core feature) is frustrating.
+### Technology Stack
 
-I was searching for other open-source alternatives (Let's be honest, any closed-source product might do the same and I don't have any reason to believe otherwise).
+| Layer | Technology |
+|-------|------------|
+| **Frontend** | Vue.js 3.4 + TypeScript + Vite |
+| **Backend** | Python 3.11 + FastAPI |
+| **Database** | MariaDB 11.0 |
+| **Cache** | Redis 7 |
+| **State** | Pinia |
+| **Styling** | Tailwind CSS |
+| **Deployment** | Docker + docker-compose |
 
-I managed to find a good app [spliit.app](https://spliit.app/) by [Sebastien Castiel](https://scastiel.dev/) but it's not a complete replacement and didn't suit my workflow sadly. Check it out to see if it fits you.
+---
 
-_That's when I decided to work on this_
+## 🚀 Quick Start
 
-## Translations
+**Single Container Deployment - Everything accessible at http://localhost**
 
-The app translations are managed using [a Weblate project](https://hosted.weblate.org/projects/splitpro/).
-You can easily add missing translations, fix issues you find and a new language! Just be aware that a new language
-also needs to be added in the code and open an issue for that once you finish translating the files.
-Here is the current state of translation:
+```bash
+# 1. Setup (first time only)
+setup.bat
 
-<a href="https://hosted.weblate.org/engage/splitpro/">
-<img src="https://hosted.weblate.org/widget/splitpro/multi-auto.svg" alt="Translation status" />
-</a>
+# 2. Start the application
+start.bat
+```
 
-## FAQ
+**That's it!** Access everything at:
+- **Application:** http://localhost
+- **API Documentation:** http://localhost/docs
+- **API Endpoints:** http://localhost/api/*
 
-#### How numerically stable is the internal logic?
+---
 
-All numbers are stored in the DB as `BigInt` data, with no floats what so ever, safeguarding your expences from rounding errors or lack of precision. This holds true for currencies with large nominal values that might outgrow the safe range of JS number type.
+**Development Mode** (separate services with hot reload):
+```bash
+start-dev.bat
+```
 
-#### How are leftover pennies handled?
+- Frontend: http://localhost:3000 (hot reload)
+- Backend: http://localhost:8000/docs
 
-In case of an expense that cannot be split evenly, the leftover amounts are distributed randomly across participants. The assignment is as equal as possible, in the context of a single expense (similar to Splitwise).
+---
 
-#### Currency rate providers
+## About
 
-Currency rate APIs are usually paywalled or rate limited, except for banking institutions. We provide 3 providers, with a developer friendly interface for adding new ones, if you are in need of more capabilities. To save your rate limits, we cache each API call in the DB and try to get as much rates as possible in a single request.
+SplitPro is an open-source expense splitting application designed to be a complete replacement for Splitwise.
 
-- [frankfurter](https://frankfurter.dev/) - completely free, but has a limited set of currencies. Check by fetching https://api.frankfurter.dev/v1/currencies
-- [Open Exchange Rates](https://openexchangerates.org/) - very capable with a generous 1000 requests/day. Requires an account and an API key. While the free version only allows USD as the base currency, we simply join the rates together. Fetching ALL rates for a single day means one API call, so unless you want to do hundreds of searches in the past, you should be fine.
-- [NBP](https://api.nbp.pl/en.html) - the central bank of Poland. Similiar case as OXR, but uses PLN as base currency and does not require an account/API key. The downside is that while table A has the most relevant (for Poland) currencies and is updated daily, table B with all the remaining ones is only published on Wednesdays. So if you need these currencies, the rates might be out of date. They also state that there is an API rate limit, but without a number, so it is to be reported.
+### ✨ Features
 
-## Tech stack
+#### Core Features ✅
+- ✅ Add expenses with individuals or groups
+- ✅ Overall balances across groups
+- ✅ Multiple currency support (20+ currencies)
+- ✅ Upload expense bills (S3/R2)
+- ✅ PWA support (installable web app)
+- ✅ Split expenses unequally (share, percentage, exact amounts, adjustments)
+- ✅ Push notifications
+- ✅ Download your data (JSON export)
+- ✅ Import from Splitwise
+- ✅ Simplify group debts
+- ✅ Community translations
+- ✅ Currency conversion
+- ✅ Recurring transactions
+- ✅ Bank account transaction integration (Plaid + GoCardless)
 
-- [NextJS](https://nextjs.org/)
-- [Tailwind](https://tailwindcss.com/)
-- [tRPC](https://trpc.io/)
-- [ShadcnUI](https://ui.shadcn.com/)
-- [Prisma](https://www.prisma.io/)
-- [Postgres](https://www.postgresql.org/)
-- [NextAuth](https://next-auth.js.org/)
+#### Advanced Features
+- Multi-currency balances
+- Magic link authentication (passwordless)
+- Google OAuth
+- Email notifications
+- Currency rate caching
+- File storage (AWS S3 / Cloudflare R2)
+- RESTful API with 48 endpoints
+- Auto-generated API documentation
 
-## Getting started.
+---
+
+## 📚 Documentation
+
+### Quick Links
+- **[FINAL_SUMMARY.md](FINAL_SUMMARY.md)** - Implementation overview
+- **[QUICKSTART_FULLSTACK.md](QUICKSTART_FULLSTACK.md)** - Detailed setup guide
+- **[DOCUMENTATION_INDEX.md](DOCUMENTATION_INDEX.md)** - Complete documentation index
+
+### Additional Documentation
+All detailed documentation has been organized in the `MD/` folder:
+- Implementation guides
+- Migration documentation
+- Architecture details
+- Developer guides
+- Contributing guidelines
+
+---
+
+## 🏗️ Project Structure
+
+```
+split-pro/
+├── frontend/              # Vue.js 3 + TypeScript + Vite
+│   ├── src/
+│   │   ├── views/         # Page components
+│   │   ├── components/    # Reusable components
+│   │   ├── stores/        # Pinia state management
+│   │   ├── services/      # API client
+│   │   └── router/        # Vue Router
+│   └── Dockerfile
+│
+├── backend/               # Python 3.11 + FastAPI
+│   ├── app/
+│   │   ├── api/routers/   # API endpoints
+│   │   ├── services/      # Business logic
+│   │   ├── models/        # SQLAlchemy models
+│   │   └── schemas/       # Pydantic schemas
+│   ├── docker-compose.yml # Full stack orchestration
+│   └── Dockerfile
+│
+├── MD/                    # Documentation
+├── .bak-project/          # Legacy Next.js code (archived)
+└── README.md              # This file
+```
+
+---
+
+## 🔧 Development
 
 ### Prerequisites
+- Docker & Docker Compose
+- Node.js 20+ (for frontend development)
+- Python 3.11+ (for backend development)
 
-- Node.js (Version: >=22.x)
-- PostgreSQL
-- pnpm (recommended)
+### Environment Setup
 
-## Docker
-
-We provide a Docker container for Splitpro, which is published on both DockerHub and GitHub Container Registry.
-
-DockerHub: [https://hub.docker.com/r/ossapps/splitpro](https://hub.docker.com/r/ossapps/splitpro)
-
-GitHub Container Registry: [https://ghcr.io/oss-apps/splitpro](https://ghcr.io/oss-apps/splitpro)
-
-You can pull the Docker image from either of these registries and run it with your preferred container hosting provider.
-
-Please note that you will need to provide environment variables for connecting to the database, redis, aws and so forth.
-
-For detailed instructions on how to configure and run the Docker container, please refer to the Docker [Docker README](./docker/README.md) in the docker directory.
-
-## Developer Setup
-
-### Install Dependencies
-
+1. **Frontend** (optional for standalone dev):
 ```bash
-corepack enable
+cd frontend
+cp .env.example .env
+npm install
+npm run dev
 ```
 
+2. **Backend** (with Docker):
 ```bash
-pnpm i
+cd backend
+docker-compose up -d
 ```
 
-### Setting up the environment
+Services:
+- MariaDB: `localhost:3307`
+- Redis: `localhost:6379`
+- Backend: `localhost:8000`
+- Frontend: `localhost:3000`
 
-- Copy the env.example file into .env
-- Setup google oauth required for auth https://next-auth.js.org/providers/google or Email provider by setting SMTP details
-- Login to minio console using `splitpro` user and password `password` and [create access keys](http://localhost:9001/access-keys/new-account) and the R2 related env variables
-- If you want to use bank integration please create a free account on [GoCardless](https://gocardless.com/bank-account-data/) or [Plaid](https://plaid.com) and then enter the the related env variables, read more in the README_BANKTRANSACTIONS.md` file.
+### API Documentation
 
-### Run the app
+Interactive API docs available at:
+- **Swagger UI:** http://localhost:8000/docs
+- **ReDoc:** http://localhost:8000/redoc
 
+All 48 endpoints are documented with request/response schemas.
+
+---
+
+## 🎯 Why This Migration?
+
+### Original Implementation (Archived)
+- Next.js 15 + React 19
+- tRPC for type-safe APIs
+- Prisma ORM + PostgreSQL
+- Complex setup, high resource usage
+
+### New Implementation ✨
+- **Simpler Stack:** Vue.js is more approachable
+- **Better Performance:** FastAPI is blazing fast
+- **Lower Resources:** Python + MariaDB uses less memory
+- **RESTful APIs:** Standard HTTP endpoints
+- **Better Docs:** Auto-generated OpenAPI specs
+- **Complete Features:** All original features + more
+
+---
+
+## 🐳 Docker Deployment
+
+### Development
 ```bash
-pnpm d
+cd backend
+docker-compose up
 ```
 
-## Sponsors
+### Production
+```bash
+cd backend
+docker-compose -f docker-compose.prod.yml up -d
+```
 
-We are grateful for the support of our sponsors.
+### Environment Variables
 
-### Our Sponsors
+Required for production:
+- `DATABASE_URL` - MariaDB connection string
+- `REDIS_URL` - Redis connection string
+- `SECRET_KEY` - JWT signing key
+- `R2_*` or `AWS_S3_*` - File storage credentials
+- `SMTP_*` - Email configuration (optional)
 
-<a href="https://hekuta.net/en" target="_blank">
-  <img src="https://avatars.githubusercontent.com/u/70084358?v=4" alt="hekuta" style="width:60px;height:60px;">
-</a>
-<a href="https://github.com/igorrrpawlowski"><img src="https:&#x2F;&#x2F;github.com&#x2F;igorrrpawlowski.png" width="60px" alt="User avatar: igorrrpawlowski" /></a>
-<a href="https://github.com/probeonstimpack"><img src="https:&#x2F;&#x2F;github.com&#x2F;probeonstimpack.png" width="60px" alt="User avatar: Marcel Szmeterowicz" /></a>
-<a href="https://github.com/mexicanhatman"><img src="https://avatars.githubusercontent.com/u/78694887?v=4" width="60px" alt="User avatar: mexicanhatman" /></a>
-<a href="https://github.com/felixdz"><img src="https://avatars.githubusercontent.com/u/11851415?v=4" width="60px" alt="User avatar: FelixDz" /></a>
+See `.env.example` for full list.
 
-## Star History
+---
 
-[![Star History Chart](https://api.star-history.com/svg?repos=oss-apps/split-pro&type=Date)](https://star-history.com/#oss-apps/split-pro&Date)
+## 🤝 Contributing
+
+We welcome contributions! See [MD/CONTRIBUTING.md](MD/CONTRIBUTING.md) for guidelines.
+
+### Development Workflow
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run tests
+5. Submit a pull request
+
+---
+
+## 📄 License
+
+This project is licensed under the terms specified in the [LICENSE](LICENSE) file.
+
+---
+
+## 🙏 Acknowledgments
+
+- Original Splitwise team for the inspiration
+- [spliit.app](https://spliit.app/) by Sebastien Castiel for the open-source alternative
+- FastAPI and Vue.js communities for excellent frameworks
+- All contributors and users
+
+---
+
+## 📞 Support
+
+- **Documentation:** [DOCUMENTATION_INDEX.md](DOCUMENTATION_INDEX.md)
+- **Issues:** GitHub Issues
+- **Discussions:** GitHub Discussions
+
+---
+
+## 🌟 Star History
+
+If you find this project useful, please consider giving it a star! ⭐
+
+---
+
+**Built with ❤️ by the open-source community**
+

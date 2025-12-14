@@ -1,60 +1,64 @@
-ARG ALPINE_VERSION=3.21
-ARG NODE_VERSION=22.16.0
+# Simple Dockerfile that expects frontend to be pre-built
+FROM python:3.11-slim as backend-builder
 
-FROM node:${NODE_VERSION}-alpine${ALPINE_VERSION} AS base
+WORKDIR /app/backend
 
-ENV SKIP_ENV_VALIDATION="true"
-ENV DOCKER_OUTPUT=1
-ENV NEXT_TELEMETRY_DISABLED=1
-ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    default-libmysqlclient-dev \
+    pkg-config \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN apk update && apk add --no-cache libc6-compat
+# Copy backend requirements
+COPY backend/requirements.txt .
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy backend application
+COPY backend/ .
+
+# Install app in development mode for proper module resolution
+RUN pip install -e .
+
+# ============================================
+# Final Production Stage
+# ============================================
+FROM python:3.11-slim
 
 WORKDIR /app
-RUN npm i -g corepack@latest && corepack enable
-COPY package.json pnpm-lock.yaml prisma/ ./
 
-RUN pnpm install
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y \
+    nginx \
+    supervisor \
+    default-libmysqlclient-dev \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
 
-COPY . .
+# Copy Python dependencies and backend app from builder
+COPY --from=backend-builder /usr/local/lib/python3.11/site-packages/ /usr/local/lib/python3.11/site-packages/
+COPY --from=backend-builder /usr/local/bin/ /usr/local/bin/
+COPY --from=backend-builder /app/backend /app/backend
 
-RUN pnpm build
+# Copy pre-built frontend from local dist folder
+COPY frontend/dist /app/frontend/dist
 
-FROM node:${NODE_VERSION}-alpine${ALPINE_VERSION} AS release
+# Copy nginx configuration
+COPY nginx.conf /etc/nginx/nginx.conf
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-ARG APP_VERSION
+# Create log directories
+RUN mkdir -p /var/log/supervisor /var/log/nginx /var/log/app
 
-ENV NODE_ENV=production
-WORKDIR /app
+# Expose single port
+EXPOSE 8012
 
-RUN apk update \
-    && apk add --no-cache libc6-compat \
-    && rm -rf /var/lib/apt/lists/* \
-	&& rm -rf /var/cache/apk/*
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+  CMD curl -f http://localhost:8012/api/health || exit 1
 
-COPY --from=base /app/next.config.js .
-COPY --from=base /app/package.json .
-COPY --from=base /app/pnpm-lock.yaml .
+# Start supervisor which manages both nginx and uvicorn
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
 
-COPY --from=base  /app/.next/standalone ./
-COPY --from=base  /app/.next/static ./.next/static
-COPY --from=base  /app/public ./public
-
-COPY --from=base  /app/prisma/schema.prisma ./prisma/schema.prisma
-COPY --from=base  /app/prisma/migrations ./prisma/migrations
-COPY --from=base  /app/node_modules/prisma ./node_modules/prisma
-COPY --from=base  /app/node_modules/@prisma ./node_modules/@prisma
-
-RUN npm i -g corepack@latest \
-    && corepack enable \
-    && mkdir node_modules/.bin \
-    && ln -s /app/node_modules/prisma/build/index.js ./node_modules/.bin/prisma
-
-# set this so it throws error where starting server
-ENV SKIP_ENV_VALIDATION="false"
-ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
-ENV APP_VERSION=${APP_VERSION}
-
-COPY ./start.sh ./start.sh
-
-CMD ["sh", "start.sh"]

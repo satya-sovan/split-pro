@@ -1,0 +1,41 @@
+# Make models importable
+from app.models.models import (
+    User,
+    Account,
+    Session,
+    VerificationToken,
+    Group,
+    GroupUser,
+    Expense,
+    ExpenseParticipant,
+    ExpenseNote,
+    ExpenseRecurrence,
+    Balance,
+    GroupBalance,
+    BalanceView,
+    CachedCurrencyRate,
+    CachedBankData,
+    PushNotification,
+    SplitType,
+)
+
+__all__ = [
+    "User",
+    "Account",
+    "Session",
+    "VerificationToken",
+    "Group",
+    "GroupUser",
+    "Expense",
+    "ExpenseParticipant",
+    "ExpenseNote",
+    "ExpenseRecurrence",
+    "Balance",
+    "GroupBalance",
+    "BalanceView",
+    "CachedCurrencyRate",
+    "CachedBankData",
+    "PushNotification",
+    "SplitType",
+]
+
