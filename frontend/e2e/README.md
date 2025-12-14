@@ -1,4 +1,4 @@
-# SplitPro E2E Test Suite
+# SAHASplit E2E Test Suite
 
 End-to-end UI automation tests using Playwright.
 

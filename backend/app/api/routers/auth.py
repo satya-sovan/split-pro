@@ -152,7 +152,7 @@ async def send_magic_link(request: MagicLinkRequest, db: Session = Depends(get_d
     # TODO: Send email with link
     # await send_email(
     #     to=request.email,
-    #     subject="Login to SplitPro",
+    #     subject="Login to SAHASplit",
     #     body=f"Click here to login: {link}"
     # )
 

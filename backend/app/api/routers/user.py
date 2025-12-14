@@ -10,7 +10,7 @@ from datetime import datetime
 
 from app.core.database import get_db
 from app.api.deps import get_current_user
-from app.models.models import User, BalanceView, Expense, Group, GroupUser, ExpenseParticipant
+from app.models.models import User, BalanceView, Expense, Group, GroupUser, ExpenseParticipant, Account, Session
 from app.schemas.user import (
     UserResponse, UserUpdate, FriendResponse,
     InviteFriendRequest, PushSubscriptionRequest
@@ -478,5 +478,321 @@ async def get_web_push_public_key(
     """
     public_key = push_service.get_public_key()
     return {"publicKey": public_key}
+
+
+# ==========================================
+# PROFILE PICTURE UPLOAD
+# ==========================================
+
+@router.post("/profile-picture/upload-url", response_model=Dict[str, str])
+async def get_profile_picture_upload_url(
+    content_type: str = Body(..., embed=True),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Get a presigned URL for uploading profile picture
+
+    Returns a presigned URL that can be used to upload the image directly to S3/R2
+    """
+    from app.services.storage_service import storage_service
+    import uuid
+
+    # Validate content type
+    allowed_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
+    if content_type not in allowed_types:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid content type. Allowed: {', '.join(allowed_types)}"
+        )
+
+    # Generate unique key for the profile picture
+    extension = content_type.split('/')[-1]
+    key = f"profile-pictures/{current_user.id}/{uuid.uuid4()}.{extension}"
+
+    try:
+        upload_url = await storage_service.get_upload_url(
+            key=key,
+            content_type=content_type,
+            file_size=5 * 1024 * 1024,  # 5MB max
+            expires_in=300  # 5 minutes
+        )
+
+        return {
+            "upload_url": upload_url,
+            "key": key
+        }
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Storage service not configured"
+        )
+
+
+@router.post("/profile-picture", response_model=UserResponse)
+async def update_profile_picture(
+    key: str = Body(..., embed=True),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Update user's profile picture URL after upload
+
+    Called after successfully uploading to the presigned URL
+    """
+    from app.services.storage_service import storage_service
+
+    # Delete old profile picture if it exists and is stored in our bucket
+    if current_user.image and current_user.image.startswith('profile-pictures/'):
+        await storage_service.delete_file(current_user.image)
+
+    # Update user with new image key
+    current_user.image = key
+    db.commit()
+    db.refresh(current_user)
+
+    return UserResponse.model_validate(current_user)
+
+
+@router.delete("/profile-picture", response_model=UserResponse)
+async def delete_profile_picture(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Delete user's profile picture
+    """
+    from app.services.storage_service import storage_service
+
+    if current_user.image and current_user.image.startswith('profile-pictures/'):
+        await storage_service.delete_file(current_user.image)
+
+    current_user.image = None
+    db.commit()
+    db.refresh(current_user)
+
+    return UserResponse.model_validate(current_user)
+
+
+@router.get("/profile-picture-url", response_model=Dict[str, str])
+async def get_profile_picture_url(
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Get the current user's profile picture URL (presigned for download)
+    """
+    from app.services.storage_service import storage_service
+
+    if not current_user.image:
+        return {"url": ""}
+
+    # If it's already a full URL (from OAuth), return as-is
+    if current_user.image.startswith('http'):
+        return {"url": current_user.image}
+
+    # Generate presigned URL for our stored images
+    try:
+        url = await storage_service.get_download_url(
+            key=current_user.image,
+            expires_in=3600  # 1 hour
+        )
+        return {"url": url}
+    except Exception:
+        return {"url": ""}
+
+
+# ==========================================
+# PASSWORD MANAGEMENT
+# ==========================================
+
+@router.post("/change-password", status_code=status.HTTP_204_NO_CONTENT)
+async def change_password(
+    current_password: str = Body(...),
+    new_password: str = Body(...),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Change user's password (for non-OAuth users)
+    """
+    from app.core.security import verify_password, get_password_hash
+
+    # Check if user has a password (non-OAuth user)
+    account = db.query(Account).filter(
+        Account.user_id == current_user.id,
+        Account.provider == "credentials"
+    ).first()
+
+    if not account:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Password change not available for OAuth accounts"
+        )
+
+    # Verify current password
+    if not account.access_token or not verify_password(current_password, account.access_token):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Current password is incorrect"
+        )
+
+    # Validate new password
+    if len(new_password) < 8:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="New password must be at least 8 characters"
+        )
+
+    # Update password
+    account.access_token = get_password_hash(new_password)
+    db.commit()
+
+    return None
+
+
+# ==========================================
+# NOTIFICATION PREFERENCES
+# ==========================================
+
+@router.get("/notification-preferences", response_model=Dict)
+async def get_notification_preferences(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Get user's notification preferences
+    """
+    # Get or create preferences from user record
+    # For now, use JSON field on user or return defaults
+    prefs = getattr(current_user, 'notification_preferences', None)
+    if not prefs:
+        prefs = {
+            "email_expense_added": True,
+            "email_expense_updated": True,
+            "email_payment_received": True,
+            "email_weekly_summary": False,
+            "push_expense_added": True,
+            "push_expense_updated": True,
+            "push_payment_received": True,
+            "push_reminders": True
+        }
+    return prefs
+
+
+@router.put("/notification-preferences", response_model=Dict)
+async def update_notification_preferences(
+    preferences: Dict = Body(...),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Update user's notification preferences
+    """
+    valid_keys = {
+        "email_expense_added", "email_expense_updated", "email_payment_received",
+        "email_weekly_summary", "push_expense_added", "push_expense_updated",
+        "push_payment_received", "push_reminders"
+    }
+
+    # Validate keys
+    for key in preferences:
+        if key not in valid_keys:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Invalid preference key: {key}"
+            )
+        if not isinstance(preferences[key], bool):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Preference values must be boolean"
+            )
+
+    # Store preferences (this would need a notification_preferences JSON column on User)
+    # For now, we'll simulate storage
+    current_user.notification_preferences = preferences
+    db.commit()
+
+    return preferences
+
+
+# ==========================================
+# ACCOUNT DELETION
+# ==========================================
+
+@router.delete("/account", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_account(
+    password: str = Body(None, embed=True),
+    confirmation: str = Body(..., embed=True),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Permanently delete user account and all associated data
+
+    Requires confirmation text "DELETE MY ACCOUNT" and password for non-OAuth users
+    """
+    from app.core.security import verify_password
+
+    # Verify confirmation
+    if confirmation != "DELETE MY ACCOUNT":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Please type 'DELETE MY ACCOUNT' to confirm"
+        )
+
+    # For non-OAuth users, verify password
+    account = db.query(Account).filter(
+        Account.user_id == current_user.id,
+        Account.provider == "credentials"
+    ).first()
+
+    if account and account.access_token:
+        if not password:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Password required to delete account"
+            )
+        if not verify_password(password, account.access_token):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Incorrect password"
+            )
+
+    # Delete profile picture from storage
+    from app.services.storage_service import storage_service
+    if current_user.image and current_user.image.startswith('profile-pictures/'):
+        await storage_service.delete_file(current_user.image)
+
+    # Delete all user data (cascading deletes handle most relationships)
+    # But we need to handle expenses carefully
+
+    # Soft-delete expenses where user is payer
+    expenses = db.query(Expense).filter(
+        Expense.paid_by == current_user.id,
+        Expense.deleted_at.is_(None)
+    ).all()
+
+    for expense in expenses:
+        expense.deleted_at = datetime.utcnow()
+        expense.deleted_by = current_user.id
+
+    # Remove user from expense participants
+    db.query(ExpenseParticipant).filter(
+        ExpenseParticipant.user_id == current_user.id
+    ).delete()
+
+    # Remove from groups
+    db.query(GroupUser).filter(
+        GroupUser.user_id == current_user.id
+    ).delete()
+
+    # Delete sessions and accounts
+    db.query(Session).filter(Session.user_id == current_user.id).delete()
+    db.query(Account).filter(Account.user_id == current_user.id).delete()
+
+    # Finally delete the user
+    db.delete(current_user)
+    db.commit()
+
+    return None
 
 

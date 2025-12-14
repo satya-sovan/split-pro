@@ -1,6 +1,6 @@
-# SplitPro Vue.js Frontend
+# SAHASplit Vue.js Frontend
 
-This is the Vue.js frontend for SplitPro, a complete rewrite from the Next.js/React implementation.
+This is the Vue.js frontend for SAHASplit, a complete rewrite from the Next.js/React implementation.
 
 ## 🚀 Quick Start
 

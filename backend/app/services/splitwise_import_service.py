@@ -93,7 +93,7 @@ class SplitwiseImportService:
                     if not user:
                         # Create placeholder user
                         user = User(
-                            email=f"{col.lower().replace(' ', '_')}@imported.splitpro",
+                            email=f"{col.lower().replace(' ', '_')}@imported.sahasplit",
                             name=col.strip(),
                             currency=current_user.currency or 'USD',
                             preferred_language='en'
@@ -283,7 +283,7 @@ class SplitwiseImportService:
             db.add(balance)
 
     def _map_category(self, splitwise_category: str) -> str:
-        """Map Splitwise category to SplitPro category"""
+        """Map Splitwise category to SAHASplit category"""
         category_map = {
             'food and drink': 'food',
             'groceries': 'groceries',

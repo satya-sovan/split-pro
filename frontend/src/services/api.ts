@@ -130,6 +130,27 @@ export interface SplitwiseImportResult {
   statistics: SplitwiseImportStats
 }
 
+export interface NotificationPreferences {
+  email_expense_added: boolean
+  email_expense_updated: boolean
+  email_payment_received: boolean
+  email_weekly_summary: boolean
+  push_expense_added: boolean
+  push_expense_updated: boolean
+  push_payment_received: boolean
+  push_reminders: boolean
+}
+
+export interface ExpenseNote {
+  id: string
+  note: string
+  created_by_id: number
+  created_by_name: string
+  created_by_image: string | null
+  created_at: string
+  expense_id: string
+}
+
 class ApiClient {
   private client: AxiosInstance
   private isRefreshing = false
@@ -323,6 +344,85 @@ class ApiClient {
   async getOwnExpenses(): Promise<Expense[]> {
     const response = await this.client.get('/users/expenses/own')
     return response.data
+  }
+
+  // ==========================================
+  // PROFILE PICTURE
+  // ==========================================
+
+  async getProfilePictureUploadUrl(contentType: string): Promise<{ upload_url: string; key: string }> {
+    const response = await this.client.post('/users/profile-picture/upload-url', { content_type: contentType })
+    return response.data
+  }
+
+  async updateProfilePicture(key: string): Promise<User> {
+    const response = await this.client.post('/users/profile-picture', { key })
+    return response.data
+  }
+
+  async deleteProfilePicture(): Promise<User> {
+    const response = await this.client.delete('/users/profile-picture')
+    return response.data
+  }
+
+  async getProfilePictureUrl(): Promise<{ url: string }> {
+    const response = await this.client.get('/users/profile-picture-url')
+    return response.data
+  }
+
+  // ==========================================
+  // PASSWORD MANAGEMENT
+  // ==========================================
+
+  async changePassword(currentPassword: string, newPassword: string): Promise<void> {
+    await this.client.post('/users/change-password', {
+      current_password: currentPassword,
+      new_password: newPassword
+    })
+  }
+
+  // ==========================================
+  // NOTIFICATION PREFERENCES
+  // ==========================================
+
+  async getNotificationPreferences(): Promise<NotificationPreferences> {
+    const response = await this.client.get('/users/notification-preferences')
+    return response.data
+  }
+
+  async updateNotificationPreferences(preferences: Partial<NotificationPreferences>): Promise<NotificationPreferences> {
+    const response = await this.client.put('/users/notification-preferences', preferences)
+    return response.data
+  }
+
+  // ==========================================
+  // ACCOUNT DELETION
+  // ==========================================
+
+  async deleteAccount(confirmation: string, password?: string): Promise<void> {
+    await this.client.delete('/users/account', {
+      data: { confirmation, password }
+    })
+  }
+
+  // ==========================================
+  // EXPENSE NOTES
+  // ==========================================
+
+  async getExpenseNotes(expenseId: string): Promise<ExpenseNote[]> {
+    const response = await this.client.get(`/expenses/${expenseId}/notes`)
+    return response.data
+  }
+
+  async addExpenseNote(expenseId: string, note: string): Promise<ExpenseNote> {
+    const response = await this.client.post(`/expenses/${expenseId}/notes`, null, {
+      params: { note }
+    })
+    return response.data
+  }
+
+  async deleteExpenseNote(expenseId: string, noteId: string): Promise<void> {
+    await this.client.delete(`/expenses/${expenseId}/notes/${noteId}`)
   }
 
   // ==========================================

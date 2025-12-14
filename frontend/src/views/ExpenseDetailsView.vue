@@ -50,6 +50,9 @@
           </div>
         </div>
 
+        <!-- Notes Section -->
+        <ExpenseNotes :expense-id="expenseId" />
+
         <!-- Actions -->
         <div class="flex gap-3">
           <button
@@ -75,6 +78,7 @@ import { computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
 import MainLayout from '@/components/Layout/MainLayout.vue'
+import ExpenseNotes from '@/components/ExpenseNotes.vue'
 import { useExpenseStore } from '@/stores/expense'
 import { formatCurrency } from '@/utils/numbers'
 import { getCategoryIcon, getCategoryLabel } from '@/lib/category'

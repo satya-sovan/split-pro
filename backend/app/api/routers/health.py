@@ -7,7 +7,7 @@ async def health_check():
     """Health check endpoint for container monitoring"""
     return {
         "status": "healthy",
-        "service": "splitpro",
+        "service": "sahasplit",
         "version": "2.0.0"
     }
 

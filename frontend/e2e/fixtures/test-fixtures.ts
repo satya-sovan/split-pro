@@ -13,7 +13,7 @@ import {
 } from '../pages';
 import { AuthHelper, ApiMocker, ScreenshotHelper } from '../utils';
 
-type SplitProFixtures = {
+type SAHASplitFixtures = {
   loginPage: LoginPage;
   registerPage: RegisterPage;
   homePage: HomePage;
@@ -30,7 +30,7 @@ type SplitProFixtures = {
   authenticatedPage: void;
 };
 
-export const test = base.extend<SplitProFixtures>({
+export const test = base.extend<SAHASplitFixtures>({
   loginPage: async ({ page }, use) => {
     await use(new LoginPage(page));
   },

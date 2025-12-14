@@ -1,6 +1,6 @@
-# SplitPro Backend (FastAPI + MariaDB)
+# SAHASplit Backend (FastAPI + MariaDB)
 
-Backend API for SplitPro expense splitting application, migrated from Next.js/tRPC to FastAPI/REST.
+Backend API for SAHASplit expense splitting application, migrated from Next.js/tRPC to FastAPI/REST.
 
 ## 🚀 Quick Start
 
@@ -306,13 +306,13 @@ docker-compose down
 
 ```bash
 # Build production image
-docker build -t splitpro-backend .
+docker build -t sahasplit-backend .
 
 # Run production container
 docker run -d \
   -p 8000:8000 \
   -e DATABASE_URL=mysql+pymysql://... \
-  splitpro-backend
+  sahasplit-backend
 ```
 
 ## 📊 Database Schema
@@ -426,7 +426,7 @@ Configured in `app/core/database.py`:
 
 ## 📄 License
 
-Same as original SplitPro project - check root LICENSE file.
+Same as original SAHASplit project - check root LICENSE file.
 
 ---
 

@@ -62,7 +62,7 @@ class PlaidService:
         try:
             request = LinkTokenCreateRequest(
                 user=LinkTokenCreateRequestUser(client_user_id=str(user_id)),
-                client_name="SplitPro",
+                client_name="SAHASplit",
                 products=[Products("transactions")],
                 country_codes=[CountryCode('US'), CountryCode('GB'), CountryCode('CA')],
                 language=language,

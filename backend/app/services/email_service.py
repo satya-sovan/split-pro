@@ -20,7 +20,7 @@ class EmailService:
         self.smtp_port = settings.SMTP_PORT or 587
         self.smtp_user = settings.SMTP_USER
         self.smtp_password = settings.SMTP_PASSWORD
-        self.from_email = settings.SMTP_FROM_EMAIL or "noreply@splitpro.app"
+        self.from_email = settings.SMTP_FROM_EMAIL or "noreply@sahasplit.app"
 
         # Setup Jinja2 for email templates
         template_dir = os.path.join(os.path.dirname(__file__), '..', 'templates', 'emails')
@@ -80,7 +80,7 @@ class EmailService:
         from_name: str
     ) -> bool:
         """
-        Send invitation email to join SplitPro
+        Send invitation email to join SAHASplit
 
         Args:
             to_email: Email of person being invited
@@ -89,15 +89,15 @@ class EmailService:
         Returns:
             True if sent successfully
         """
-        subject = f"{from_name} invited you to SplitPro"
+        subject = f"{from_name} invited you to SAHASplit"
 
         html_content = f"""
         <html>
             <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                <h2>You're invited to SplitPro!</h2>
-                <p><strong>{from_name}</strong> has invited you to join SplitPro to split expenses together.</p>
+                <h2>You're invited to SAHASplit!</h2>
+                <p><strong>{from_name}</strong> has invited you to join SAHASplit to split expenses together.</p>
                 
-                <p>SplitPro makes it easy to:</p>
+                <p>SAHASplit makes it easy to:</p>
                 <ul>
                     <li>Track shared expenses</li>
                     <li>Split bills fairly</li>
@@ -107,7 +107,7 @@ class EmailService:
                 <p style="margin-top: 30px;">
                     <a href="{settings.CORS_ORIGINS[0]}/auth/register?email={to_email}" 
                        style="background-color: #4CAF50; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block;">
-                        Join SplitPro
+                        Join SAHASplit
                     </a>
                 </p>
                 
@@ -120,9 +120,9 @@ class EmailService:
         """
 
         text_content = f"""
-        You're invited to SplitPro!
+        You're invited to SAHASplit!
         
-        {from_name} has invited you to join SplitPro to split expenses together.
+        {from_name} has invited you to join SAHASplit to split expenses together.
         
         Visit: {settings.CORS_ORIGINS[0]}/auth/register?email={to_email}
         """
@@ -188,18 +188,18 @@ class EmailService:
         Returns:
             True if sent successfully
         """
-        subject = "Your SplitPro Login Link"
+        subject = "Your SAHASplit Login Link"
 
         html_content = f"""
         <html>
             <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                <h2>Login to SplitPro</h2>
-                <p>Click the button below to log in to your SplitPro account:</p>
+                <h2>Login to SAHASplit</h2>
+                <p>Click the button below to log in to your SAHASplit account:</p>
                 
                 <p style="margin-top: 30px;">
                     <a href="{magic_link}" 
                        style="background-color: #4CAF50; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block;">
-                        Log In to SplitPro
+                        Log In to SAHASplit
                     </a>
                 </p>
                 
@@ -215,7 +215,7 @@ class EmailService:
         """
 
         text_content = f"""
-        Login to SplitPro
+        Login to SAHASplit
         
         Click this link to log in: {magic_link}
         

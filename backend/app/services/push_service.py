@@ -17,7 +17,7 @@ class PushNotificationService:
         self.vapid_private_key = settings.WEB_PUSH_PRIVATE_KEY
         self.vapid_public_key = settings.WEB_PUSH_PUBLIC_KEY
         self.vapid_claims = {
-            "sub": f"mailto:{settings.WEB_PUSH_EMAIL or 'noreply@splitpro.app'}"
+            "sub": f"mailto:{settings.WEB_PUSH_EMAIL or 'noreply@sahasplit.app'}"
         }
 
     async def send_notification(

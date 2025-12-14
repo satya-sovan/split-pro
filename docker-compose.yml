@@ -1,12 +1,12 @@
 services:
   mariadb:
     image: mariadb:11.0
-    container_name: splitpro-mariadb
+    container_name: sahasplit-mariadb
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: splitpro
-      MYSQL_USER: splitpro
+      MYSQL_DATABASE: sahasplit
+      MYSQL_USER: sahasplit
       MYSQL_PASSWORD: password
     ports:
       - "3307:3306"
@@ -18,11 +18,11 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - splitpro-network
+      - sahasplit-network
 
   redis:
     image: redis:7-alpine
-    container_name: splitpro-redis
+    container_name: sahasplit-redis
     restart: unless-stopped
     ports:
       - "6379:6379"
@@ -34,24 +34,24 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - splitpro-network
+      - sahasplit-network
 
   app:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: splitpro-app
+    container_name: sahasplit-app
     restart: unless-stopped
     ports:
       - "8012:8012"
     environment:
-      DATABASE_URL: mysql+pymysql://splitpro:password@mariadb:3306/splitpro
+      DATABASE_URL: mysql+pymysql://sahasplit:password@mariadb:3306/sahasplit
       REDIS_URL: redis://redis:6379
       SECRET_KEY: dev-secret-key-change-in-production-123456789
       DEBUG: "False"
       # API Configuration
       API_V1_PREFIX: /api
-      PROJECT_NAME: SplitPro
+      PROJECT_NAME: SAHASplit
       # CORS Settings (not needed since same origin now)
       BACKEND_CORS_ORIGINS: '["http://localhost"]'
     depends_on:
@@ -60,7 +60,7 @@ services:
       redis:
         condition: service_healthy
     networks:
-      - splitpro-network
+      - sahasplit-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/api/health"]
       interval: 30s
@@ -69,10 +69,9 @@ services:
       start_period: 40s
 
 networks:
-  splitpro-network:
+  sahasplit-network:
     driver: bridge
 
 volumes:
   mariadb_data:
   redis_data:
-

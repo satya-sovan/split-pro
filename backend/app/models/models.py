@@ -35,6 +35,9 @@ class User(Base):
     obapi_provider_id = Column(String(255), nullable=True)
     # Store as JSON array instead of PostgreSQL array
     hidden_friend_ids = Column(JSON, default=list, nullable=False)
+    # Notification preferences stored as JSON (nullable for MySQL compatibility)
+    notification_preferences = Column(JSON, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=True)
 
     # Relationships
     accounts = relationship("Account", back_populates="user", cascade="all, delete-orphan")

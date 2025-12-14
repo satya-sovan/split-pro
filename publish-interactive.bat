@@ -192,17 +192,17 @@ echo   SUCCESS! Your image is published!
 echo ============================================================
 echo.
 echo Your image is now live on Docker Hub:
-echo   https://hub.docker.com/r/%USERNAME%/docker-autoheal
+echo   https://hub.docker.com/r/%USERNAME%/sahasplit
 echo.
 echo Anyone can now use it with:
-echo   docker pull %USERNAME%/splitpro:%TAG%
+echo   docker pull %USERNAME%/sahasplit:%TAG%
 echo.
 echo To run it:
-echo   docker run -d --name splitpro \
+echo   docker run -d --name sahasplit \
 echo     -p 8012:8012 \
 echo     -e DATABASE_URL=mysql+pymysql://user:pass@host:3306/db \
 echo     -e SECRET_KEY=your-secret-key \
-echo     %USERNAME%/splitpro:%TAG%
+echo     %USERNAME%/sahasplit:%TAG%
 echo.
 pause
 

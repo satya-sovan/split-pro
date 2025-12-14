@@ -6,7 +6,7 @@ class Settings(BaseSettings):
     """Application settings loaded from environment variables"""
 
     # App settings
-    APP_NAME: str = "SplitPro"
+    APP_NAME: str = "SAHASplit"
     DEBUG: bool = False
     API_VERSION: str = "v1"
 
@@ -14,9 +14,9 @@ class Settings(BaseSettings):
     DATABASE_URL: str
     DB_HOST: Optional[str] = "localhost"
     DB_PORT: int = 3306
-    DB_USER: Optional[str] = "splitpro"
+    DB_USER: Optional[str] = "sahasplit"
     DB_PASSWORD: Optional[str] = None
-    DB_NAME: Optional[str] = "splitpro"
+    DB_NAME: Optional[str] = "sahasplit"
 
     # Security
     SECRET_KEY: str
@@ -41,7 +41,7 @@ class Settings(BaseSettings):
     SMTP_PORT: int = 587
     SMTP_USER: Optional[str] = None
     SMTP_PASSWORD: Optional[str] = None
-    SMTP_FROM_EMAIL: str = "noreply@splitpro.app"
+    SMTP_FROM_EMAIL: str = "noreply@sahasplit.app"
     SUPPORT_EMAIL: Optional[str] = None
 
     # S3/R2 Storage

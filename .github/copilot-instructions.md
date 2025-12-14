@@ -1,8 +1,8 @@
-# SplitPro AI Coding Agent Instructions
+# SAHASplit AI Coding Agent Instructions
 
 ## Architecture Overview
 
-SplitPro is a **Next.js PWA** expense-splitting app (Splitwise alternative). Core architecture:
+SAHASplit is a **Next.js PWA** expense-splitting app (Splitwise alternative). Core architecture:
 
 - **Frontend**: Next.js 15, React 19, Tailwind + ShadcnUI, Zustand for state
 - **Backend**: tRPC routers with Prisma ORM, NextAuth for auth
@@ -102,7 +102,7 @@ Environment variables are validated via `@t3-oss/env-nextjs` in `src/env.ts`. Re
 - **Storage**: R2/S3 credentials (`R2_*` or `AWS_S3_*` variables)
 - **Optional**: Bank integration (Plaid/GoCardless), currency rate API keys, push notification VAPID keys
 
-For local dev: run `pnpm d` to start PostgreSQL + MinIO in Docker. Access MinIO console at `http://localhost:9001` (user: `splitpro`, pass: `password`) to create access keys.
+For local dev: run `pnpm d` to start PostgreSQL + MinIO in Docker. Access MinIO console at `http://localhost:9001` (user: `sahasplit`, pass: `password`) to create access keys.
 
 ## Data Flow Specifics
 

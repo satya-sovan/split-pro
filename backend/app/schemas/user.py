@@ -2,7 +2,7 @@
 Pydantic schemas for user-related requests and responses
 """
 from pydantic import BaseModel, EmailStr, Field
-from typing import Optional, List
+from typing import Optional, List, Dict
 from datetime import datetime
 
 
@@ -28,6 +28,7 @@ class UserResponse(BaseModel):
     image: Optional[str]
     currency: str
     preferred_language: str
+    created_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True
@@ -57,6 +58,35 @@ class MagicLinkRequest(BaseModel):
 class MagicLinkVerify(BaseModel):
     """Schema for magic link verification"""
     token: str
+
+
+class NotificationPreferences(BaseModel):
+    """Schema for notification preferences"""
+    email_expense_added: bool = True
+    email_expense_updated: bool = True
+    email_payment_received: bool = True
+    email_weekly_summary: bool = False
+    push_expense_added: bool = True
+    push_expense_updated: bool = True
+    push_payment_received: bool = True
+    push_reminders: bool = True
+
+
+class ChangePasswordRequest(BaseModel):
+    """Schema for changing password"""
+    current_password: str
+    new_password: str = Field(..., min_length=8)
+
+
+class DeleteAccountRequest(BaseModel):
+    """Schema for account deletion"""
+    password: Optional[str] = None
+    confirmation: str = Field(..., description="Must be 'DELETE MY ACCOUNT'")
+
+
+class ProfilePictureUploadRequest(BaseModel):
+    """Schema for requesting profile picture upload URL"""
+    content_type: str = Field(..., description="MIME type of the image")
 
 
 class FriendResponse(BaseModel):

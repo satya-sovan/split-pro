@@ -8,6 +8,8 @@ interface User {
   name: string
   currency: string
   preferredLanguage?: string
+  image?: string | null
+  created_at?: string
 }
 
 export const useAuthStore = defineStore('auth', () => {

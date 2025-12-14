@@ -61,7 +61,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title=settings.APP_NAME,
     version=settings.API_VERSION,
-    description="SplitPro - Expense splitting application API",
+    description="SAHASplit - Expense splitting application API",
     docs_url="/docs",
     redoc_url="/redoc",
     openapi_url="/openapi.json",
@@ -90,7 +90,7 @@ app.include_router(health.router, prefix="/api")
 async def root():
     """Root endpoint - redirects to docs"""
     return {
-        "message": "SplitPro API",
+        "message": "SAHASplit API",
         "version": settings.API_VERSION,
         "docs": "/docs",
         "api": "/api"

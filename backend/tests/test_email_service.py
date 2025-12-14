@@ -100,14 +100,14 @@ class TestEmailService:
         # Verify email contains invitation details
         msg = mock_send.call_args.args[0]
         assert "John Doe" in msg.as_string()
-        assert "invited you to SplitPro" in msg['Subject']
+        assert "invited you to SAHASplit" in msg['Subject']
 
     @pytest.mark.asyncio
     @patch('aiosmtplib.send')
     async def test_send_feedback_email(self, mock_send, email_svc, mock_user):
         """Test sending feedback email"""
         mock_send.return_value = AsyncMock()
-        email_svc.from_email = "noreply@splitpro.app"
+        email_svc.from_email = "noreply@sahasplit.app"
 
         result = await email_svc.send_feedback_email(
             feedback="This is my feedback about the app",
@@ -130,7 +130,7 @@ class TestEmailService:
         """Test sending magic link email"""
         mock_send.return_value = AsyncMock()
 
-        magic_link = "https://splitpro.app/auth/verify?token=abc123"
+        magic_link = "https://sahasplit.app/auth/verify?token=abc123"
 
         result = await email_svc.send_magic_link_email(
             to_email="user@test.com",
@@ -142,7 +142,7 @@ class TestEmailService:
 
         # Verify email contains magic link
         msg = mock_send.call_args.args[0]
-        assert "Login to SplitPro" in msg['Subject']
+        assert "Login to SAHASplit" in msg['Subject']
         email_body = msg.as_string()
         assert magic_link in email_body
         assert "expire in 1 hour" in email_body

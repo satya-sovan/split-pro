@@ -1,8 +1,8 @@
 @echo off
-REM Build and Run Script for SplitPro
+REM Build and Run Script for SAHASplit
 
 echo ========================================
-echo   SplitPro - Build Script
+echo   SAHASplit - Build Script
 echo ========================================
 echo.
 
@@ -66,7 +66,7 @@ echo   API: http://localhost:8012/api
 echo   API Docs: http://localhost:8012/api/docs
 echo.
 echo   View logs:
-echo   docker logs -f splitpro-app
+echo   docker logs -f sahasplit-app
 echo.
 pause
 

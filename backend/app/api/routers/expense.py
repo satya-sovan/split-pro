@@ -371,3 +371,166 @@ async def remove_expense(
     """Delete an expense (soft delete)"""
     await delete_expense(db, expense_id, current_user.id)
     return None
+
+
+# ==========================================
+# EXPENSE NOTES
+# ==========================================
+
+@router.get("/{expense_id}/notes")
+async def get_expense_notes(
+    expense_id: str,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Get all notes for an expense
+    """
+    from app.models.models import ExpenseNote
+
+    # Verify expense exists and user has access
+    expense = db.query(Expense).filter(Expense.id == expense_id).first()
+    if not expense:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Expense not found"
+        )
+
+    # Check user has access (is participant or payer)
+    participant = db.query(ExpenseParticipant).filter(
+        ExpenseParticipant.expense_id == expense_id,
+        ExpenseParticipant.user_id == current_user.id
+    ).first()
+
+    if not participant and expense.paid_by != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You don't have access to this expense"
+        )
+
+    notes = db.query(ExpenseNote).filter(
+        ExpenseNote.expense_id == expense_id
+    ).order_by(ExpenseNote.created_at.desc()).all()
+
+    # Get user info for note authors
+    user_ids = list(set(n.created_by_id for n in notes))
+    users = db.query(User).filter(User.id.in_(user_ids)).all()
+    user_map = {u.id: {"name": u.name or u.email, "image": u.image} for u in users}
+
+    return [
+        {
+            "id": n.id,
+            "note": n.note,
+            "created_by_id": n.created_by_id,
+            "created_by_name": user_map.get(n.created_by_id, {}).get("name", "Unknown"),
+            "created_by_image": user_map.get(n.created_by_id, {}).get("image"),
+            "created_at": n.created_at.isoformat(),
+            "expense_id": n.expense_id
+        }
+        for n in notes
+    ]
+
+
+@router.post("/{expense_id}/notes")
+async def add_expense_note(
+    expense_id: str,
+    note: str,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Add a note to an expense
+    """
+    from app.models.models import ExpenseNote
+
+    # Verify expense exists
+    expense = db.query(Expense).filter(Expense.id == expense_id).first()
+    if not expense:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Expense not found"
+        )
+
+    # Check user has access (is participant or payer)
+    participant = db.query(ExpenseParticipant).filter(
+        ExpenseParticipant.expense_id == expense_id,
+        ExpenseParticipant.user_id == current_user.id
+    ).first()
+
+    if not participant and expense.paid_by != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You don't have access to this expense"
+        )
+
+    # Validate note
+    if not note or len(note.strip()) == 0:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Note cannot be empty"
+        )
+
+    if len(note) > 1000:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Note is too long (max 1000 characters)"
+        )
+
+    # Create note
+    new_note = ExpenseNote(
+        id=str(uuid4()),
+        note=note.strip(),
+        created_by_id=current_user.id,
+        expense_id=expense_id
+    )
+
+    db.add(new_note)
+    db.commit()
+    db.refresh(new_note)
+
+    return {
+        "id": new_note.id,
+        "note": new_note.note,
+        "created_by_id": new_note.created_by_id,
+        "created_by_name": current_user.name or current_user.email,
+        "created_by_image": current_user.image,
+        "created_at": new_note.created_at.isoformat(),
+        "expense_id": new_note.expense_id
+    }
+
+
+@router.delete("/{expense_id}/notes/{note_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_expense_note(
+    expense_id: str,
+    note_id: str,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Delete a note from an expense (only the author can delete)
+    """
+    from app.models.models import ExpenseNote
+
+    note = db.query(ExpenseNote).filter(
+        ExpenseNote.id == note_id,
+        ExpenseNote.expense_id == expense_id
+    ).first()
+
+    if not note:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Note not found"
+        )
+
+    # Only the author can delete
+    if note.created_by_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You can only delete your own notes"
+        )
+
+    db.delete(note)
+    db.commit()
+
+    return None
+

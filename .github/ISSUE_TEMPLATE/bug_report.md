@@ -24,7 +24,7 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots to help explain your problem.
 
 **App version**
-Do not post issues about splitpro.app! It is no longer maintained and a lot of its issues have been fixed. Please post here the tagged release you are using (1.5.3, 1.4.0 etc) or the commit hash if building from source.
+Do not post issues about sahasplit.app! It is no longer maintained and a lot of its issues have been fixed. Please post here the tagged release you are using (1.5.3, 1.4.0 etc) or the commit hash if building from source.
 
 **Desktop (please complete the following information):**
  - OS: [e.g. iOS]

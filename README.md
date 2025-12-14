@@ -1,9 +1,9 @@
 <p align="center" style="margin-top: 12px">
-  <a href="https://splitpro.app">
-  <img width="100px"  style="border-radius: 50%;" src="https://splitpro.app/logo_circle.png" alt="SplitPro Logo">
+  <a href="https://sahasplit.app">
+  <img width="100px"  style="border-radius: 50%;" src="https://sahasplit.app/logo_circle.png" alt="SAHASplit Logo">
   </a>
 
-  <h1 align="center">SplitPro</h1>
+  <h1 align="center">SAHASplit</h1>
   <h2 align="center">An open source alternative to Splitwise</h2>
   <p align="center">
     <strong>🎉 Now with Unified Deployment - Single Container, Single URL!</strong>
@@ -63,7 +63,7 @@ start-dev.bat
 
 ## About
 
-SplitPro is an open-source expense splitting application designed to be a complete replacement for Splitwise.
+SAHASplit is an open-source expense splitting application designed to be a complete replacement for Splitwise.
 
 ### ✨ Features
 

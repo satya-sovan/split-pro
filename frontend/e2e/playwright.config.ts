@@ -3,7 +3,7 @@ import { defineConfig, devices } from '@playwright/test';
 const authFile = 'playwright/.auth/user.json';
 
 /**
- * Playwright configuration for SplitPro E2E tests
+ * Playwright configuration for SAHASplit E2E tests
  * @see https://playwright.dev/docs/test-configuration
  */
 export default defineConfig({
