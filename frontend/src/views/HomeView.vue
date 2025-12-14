@@ -1,6 +1,26 @@
 <template>
   <MainLayout title="Home">
     <div class="p-6">
+      <!-- Logo -->
+      <div class="mb-6 flex justify-center">
+        <svg width="300" height="80" viewBox="0 0 900 240" xmlns="http://www.w3.org/2000/svg">
+          <!-- ICON -->
+          <g transform="translate(40, 20)">
+            <!-- Background Circle -->
+            <circle cx="100" cy="100" r="100" fill="#1F7A7A"/>
+            <!-- Left Person -->
+            <circle cx="65" cy="100" r="18" fill="#FFFFFF"/>
+            <!-- Right Person -->
+            <circle cx="135" cy="100" r="18" fill="#FFFFFF"/>
+            <!-- Split Line -->
+            <rect x="94" y="55" width="12" height="90" rx="6" fill="#FFFFFF"/>
+          </g>
+          <!-- TEXT -->
+          <text x="280" y="140" font-family="Inter, Poppins, Roboto, sans-serif" font-size="96" font-weight="600" fill="#0F172A">SAHA</text>
+          <text x="560" y="140" font-family="Inter, Poppins, Roboto, sans-serif" font-size="96" font-weight="400" fill="#475569">Split</text>
+        </svg>
+      </div>
+
       <div class="mb-8">
         <h1 class="text-3xl font-bold mb-2">Welcome, {{ authStore.user?.name }}!</h1>
         <p class="text-muted-foreground">Track and split expenses with friends and groups</p>

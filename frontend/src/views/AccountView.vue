@@ -133,7 +133,7 @@
             <div class="flex items-center justify-between">
               <div>
                 <span class="font-medium">Export Data</span>
-                <p class="text-sm text-muted-foreground">Download all your SplitPro data</p>
+                <p class="text-sm text-muted-foreground">Download all your SAHA Split data</p>
               </div>
               <DownloadIcon class="h-5 w-5 text-muted-foreground" />
             </div>

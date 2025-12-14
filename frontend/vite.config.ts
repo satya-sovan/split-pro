@@ -11,10 +11,10 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'favicon.svg', 'logo.svg', 'logo.png', 'icons/*.svg', 'icons/*.png'],
       manifest: {
-        name: 'SplitPro',
-        short_name: 'SplitPro',
+        name: 'SAHA Split',
+        short_name: 'SAHA Split',
         description: 'Split expenses with friends and groups',
-        theme_color: '#3b82f6',
+        theme_color: '#1F7A7A',
         background_color: '#ffffff',
         display: 'standalone',
         orientation: 'portrait',

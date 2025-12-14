@@ -4,7 +4,7 @@
     <header class="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div class="container flex h-14 items-center">
         <div class="flex-1 flex items-center gap-2">
-          <img src="/icons/icon-512x512.svg" alt="SplitPro" class="h-8 w-8 rounded-lg" />
+          <img src="/icons/icon-512x512.svg" alt="SAHA Split" class="h-8 w-8" />
           <h1 class="text-lg font-semibold">{{ title }}</h1>
         </div>
         <div class="flex items-center gap-2">

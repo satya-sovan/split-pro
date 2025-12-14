@@ -1,5 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
-  <rect width="192" height="192" fill="#3b82f6" rx="24"/>
-  <text x="96" y="120" font-family="Arial, sans-serif" font-size="80" font-weight="bold" fill="white" text-anchor="middle">S</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="192" height="192">
+  <!-- Background -->
+  <circle cx="256" cy="256" r="256" fill="#1F7A7A"/>
+  <!-- Left Person -->
+  <circle cx="176" cy="256" r="36" fill="#FFFFFF"/>
+  <!-- Right Person -->
+  <circle cx="336" cy="256" r="36" fill="#FFFFFF"/>
+  <!-- Split Line -->
+  <rect x="246" y="156" width="20" height="200" rx="10" fill="#FFFFFF"/>
 </svg>
 
